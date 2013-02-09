@@ -12,7 +12,7 @@
 
 class c_display
 {
-	int pid, pp[2];
+	int pid, disp_name_pp[2], sync_pp[2];
 	shared_ptr<c_bitmap> bmp;
 
 	int thread_main();
