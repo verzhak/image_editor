@@ -1,8 +1,19 @@
 
 #include "bitmap/display.h"
 
+c_display::c_display(c_bitmap * t_bmp, string t_disp_name) :
+	bmp(t_bmp), is_full(false), disp_name(t_disp_name)
+{
+	create();
+}
+
 c_display::c_display(shared_ptr<c_bitmap> t_bmp, string t_disp_name) :
 	bmp(t_bmp), is_full(false), disp_name(t_disp_name)
+{
+	create();
+}
+
+void c_display::create()
 {
 	pipe(disp_name_pp);
 	pipe(sync_pp);

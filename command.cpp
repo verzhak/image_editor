@@ -654,6 +654,15 @@ bool do_command(string & command)
  
 			return true;
 		}
+
+		if(regexp[COMMAND_MORPHOLOGY]->FullMatch(command, & disp_name, & new_disp_name))
+ 		{
+			// TODO
+			FIND_DISP(disp_name, p_disp);
+			CHECK_INSERT_DISP(morphology(p_disp->bitmap_ptr()));
+ 
+			return true;
+		}
 	}
 	catch(string & err)
 	{
@@ -719,6 +728,9 @@ void main_loop::init()
 
 	regexp.insert(make_pair(COMMAND_RADIOMETRIC_CORRECTION,
 				new RE("^[ \\t]*(?:correction radiometric|crad)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]+([\\d]+)[ \\t]*$")));
+
+	regexp.insert(make_pair(COMMAND_MORPHOLOGY,
+				new RE("^[ \\t]*(?:morphology|m)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]*$")));
 }
 
 void main_loop::destroy()

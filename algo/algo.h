@@ -67,6 +67,8 @@ namespace algo
 	shared_ptr<c_bitmap> differential_operator(c_bitmap & bmp, double k);
 
 	shared_ptr<c_bitmap> radiometric_correction(c_bitmap & bmp, unsigned N);
+
+	extern "C" c_bitmap * morphology(c_bitmap * src);
 };
 
 #endif

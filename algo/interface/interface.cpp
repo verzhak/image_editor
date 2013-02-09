@@ -1,5 +1,5 @@
 
-#include "algo/interface.h"
+#include "algo/interface/interface.h"
 
 c_bitmap * create(unsigned height, unsigned width)
 {
