@@ -2,8 +2,6 @@
 #ifndef TIFF_H
 #define TIFF_H
 
-#include "algo/algo.h"
-
 // Типы ключей IFD
 #define BYTE		1
 #define ASCII		2

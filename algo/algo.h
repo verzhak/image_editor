@@ -3,11 +3,14 @@
 #define ALGO_H
 
 #include "all.h"
+#include "lib/file.h"
 #include "bitmap/color.h"
 #include "bitmap/bitmap.h"
 #include "bitmap/display.h"
 
 #define TO_RADIAN(angle) (M_PI * (angle) / 180.0)
+
+using namespace file;
 
 namespace algo
 {

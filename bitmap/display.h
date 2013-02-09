@@ -12,10 +12,10 @@
 
 class c_display
 {
-	int pid;
+	int pid, pp[2];
 	shared_ptr<c_bitmap> bmp;
 
-	int thread_main(int * pp);
+	int thread_main();
 
 	public:
 

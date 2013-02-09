@@ -4,25 +4,19 @@
 c_display::c_display(shared_ptr<c_bitmap> t_bmp, string t_disp_name) :
 	bmp(t_bmp), is_full(false), disp_name(t_disp_name)
 {
-	int pp[2];
-
 	pipe(pp);
 	pid = fork();
 
 	if(pid == -1)
 		throw string("Ошибка при попытке отобразить изображение");
 	else if(! pid)
-		exit(thread_main(pp));
+		exit(thread_main());
 
 	// ############################################################################ 
 	// Ждем запуска дочернего процесса
 	
-	close(pp[1]);
-
 	char notused;
 	read(pp[0], & notused, 1);
-
-	close(pp[0]);
 
 	// ############################################################################ 
 
@@ -33,13 +27,20 @@ c_display::~c_display()
 {
 	kill(pid, SIGTERM);
 	waitpid(pid, NULL, 0);
+
+	close(pp[0]);
+	close(pp[1]);
 }
 
 void c_display::refresh()
 {
-	kill(pid, SIGUSR1);
+	const char * disp_name_c_str = disp_name.c_str();
+	unsigned disp_name_len = strlen(disp_name_c_str); // Гарантировано точно возвращает размер в байтах строки
 
-	// TODO пересылка disp_name
+	write(pp[1], & disp_name_len, sizeof(disp_name_len));
+	write(pp[1], disp_name_c_str, disp_name_len);
+
+	kill(pid, SIGUSR1);
 }
 
 void c_display::toggle_full()
@@ -51,6 +52,9 @@ void c_display::toggle_full()
 
 // ############################################################################ 
 
+int * temp_pp;
+string temp_disp_name;
+
 #define EVENT_REFRESH SDL_USEREVENT
 #define EVENT_TERMINATE (SDL_USEREVENT + 1)
 #define EVENT_TOGGLE_FULL (SDL_USEREVENT + 2)
@@ -58,6 +62,21 @@ void c_display::toggle_full()
 void SIGUSR1_handler(int notused)
 {
 	// refresh
+	
+	unsigned buf_len;
+	shared_ptr<char> buf;
+	char * p_buf;
+	
+	read(temp_pp[0], & buf_len, sizeof(buf_len));
+	buf.reset(new char[buf_len + 1]);
+	p_buf = buf.get();
+
+	if(buf)
+	{
+		read(temp_pp[0], p_buf, buf_len);
+		p_buf[buf_len] = '\0';
+		temp_disp_name = p_buf;
+	}
 
 	SDL_Event rk;
 
@@ -85,7 +104,7 @@ void SIGTERM_handler(int notused)
 	SDL_PushEvent(& rk);
 }
 
-int c_display::thread_main(int * pp)
+int c_display::thread_main()
 {
 	SDL_Init(SDL_INIT_VIDEO);
 
@@ -105,9 +124,8 @@ int c_display::thread_main(int * pp)
 	signal(SIGUSR2, & SIGUSR2_handler);
 	signal(SIGTERM, & SIGTERM_handler);
 
-	close(pp[0]);
+	temp_pp = pp;
 	write(pp[1], & is_run, 1);
-	close(pp[1]);
 
 	while(is_run)
 	{
@@ -115,6 +133,7 @@ int c_display::thread_main(int * pp)
 
 		if(event.type == EVENT_REFRESH)
 		{
+			disp_name = temp_disp_name;
 			SDL_WM_SetCaption(disp_name.c_str(), NULL);
 
 			SDL_LockSurface(surf);

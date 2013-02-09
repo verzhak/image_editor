@@ -696,7 +696,7 @@ void main_loop::init()
 	regexp.insert(make_pair(COMMAND_RESET_AOI, new RE("^[ \\t]*(?:reset aoi|ra)[ \\t]+([^ \\t]+)[ \\t]*$")));
 	regexp.insert(make_pair(COMMAND_DISP_AOI, new RE("^[ \\t]*(?:disp aoi|da)[ \\t]+([^ \\t]+)[ \\t]+(\\w+)[ \\t]*$")));
 	
-	regexp.insert(make_pair(COMMAND_CONTRAST, new RE("^[ \\t]*(?:contrast|cn)[ \\t]+([^ \\t]+)[ \\t]*$"))); // TODO Правильность работы под вопросом
+	regexp.insert(make_pair(COMMAND_CONTRAST, new RE("^[ \\t]*(?:contrast|cn)[ \\t]+([^ \\t]+)[ \\t]*$")));
 	regexp.insert(make_pair(COMMAND_ROTATE,
 				new RE("^[ \\t]*(?:rotate|rt)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]+([-+]?\\d+\\.?\\d*)(r|g)[ \\t]+([\\d]+)[ \\t]+([\\d]+)[ \\t]*$")));
 	regexp.insert(make_pair(COMMAND_DIFF, new RE("^[ \\t]*(?:diff|df)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]*$")));

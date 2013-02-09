@@ -1,7 +1,6 @@
 
+#include "algo/algo.h"
 #include "algo/tiff/tiff.h"
-
-// TODO Возможный баг с чтением / сохранением s16
 
 unsigned type_size[] = {0, 1, 1, 2, 4, 8, 1, 1, 2, 4, 8, 4, 8};
 
@@ -9,10 +8,9 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 {
 	s_header header;
 	shared_ptr<c_bitmap> bmp;
-	shared_ptr<FILE> fl(fopen(fname.c_str(), "r"), fclose);
-	FILE * p_fl = fl.get();
+	c_file fl(fname, MODE_READ);
 
-	fread(& header, 8, 1, p_fl);
+	fl.read(& header, 8);
 
 	// Чтение заголовка
 
@@ -43,14 +41,14 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 		// Последовательное чтение каждого изображения
 
 		// Чтение количества ключей в IFD обрабатываемого изображения
-		fseek(p_fl, ifd_off, SEEK_SET);
-		fread(& key_num, 2, 1, p_fl);
+		fl.seek_set(ifd_off);
+		fl.read(& key_num, 2);
 
 		// Обработка ключей IFD очередного изображения
 
 		key.reset(new s_ifd_key[key_num]);
 		p_key = key.get();
-		fread(p_key, sizeof(s_ifd_key), key_num, p_fl);
+		fl.read(p_key, sizeof(s_ifd_key) * key_num);
 
 		for(u = 0; u < key_num; u++, p_key++)
 			switch(p_key->tag)
@@ -84,8 +82,8 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 						}
 						default:
 						{
-							fseek(p_fl, value, SEEK_SET);
-							fread(p_byte_per_sample, 2, count, p_fl);
+							fl.seek_set(value);
+							fl.read(p_byte_per_sample, 2 * count);
 
 							for(v = 0; v < count; v++)
 								p_byte_per_sample[v] >>= 3;
@@ -139,8 +137,8 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 					strip_offset.reset(new unsigned [count]);
 					p_strip_offset = strip_offset.get();
 
-					fseek(p_fl, p_key->value, SEEK_SET);
-					fread(p_buffer, size, count, p_fl);
+					fl.seek_set(p_key->value);
+					fl.read(p_buffer, size * count);
 
 					if(size == 2)
 						for(v = 0; v < count; v++)
@@ -175,8 +173,8 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 					buffer.reset(new uint8_t[count * size]);
 					p_buffer = buffer.get();
 
-					fseek(p_fl, p_key->value, SEEK_SET);
-					fread(p_buffer, size, count, p_fl);
+					fl.seek_set(p_key->value);
+					fl.read(p_buffer, size * count);
 
 					if(size == 2)
 						for(v = 0; v < count; v++)
@@ -211,8 +209,8 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 						}
 						default:
 						{
-							fseek(p_fl, value, SEEK_SET);
-							fread(p_sample_format, 2, count, p_fl);
+							fl.seek_set(value);
+							fl.read(p_sample_format, 2 * count);
 						}
 					}
 
@@ -268,8 +266,8 @@ void algo::load_tiff(const string & fname, vector<shared_ptr<c_bitmap> > & bmp_a
 		{
 			p_buffer = buffer.get();
 
-			fseek(p_fl, p_strip_offset[u], SEEK_SET);
-			fread(p_buffer, 1, p_strip_size[u], p_fl);
+			fl.seek_set(p_strip_offset[u]);
+			fl.read(p_buffer, p_strip_size[u]);
 
 			if(
 				u == strip_num - 1
@@ -369,8 +367,8 @@ case FLOAT_SF:\
 
 		// Переход к очередному изображению
 
-		fseek(p_fl, ifd_off + 2 + sizeof(s_ifd_key) * key_num, SEEK_SET);
-		fread(& ifd_off, 4, 1, p_fl);
+		fl.seek_set(ifd_off + 2 + sizeof(s_ifd_key) * key_num);
+		fl.read(& ifd_off, 4);
 
 		page_sc ++;
 	}
@@ -387,9 +385,8 @@ void algo::save_tiff(vector<shared_ptr<c_bitmap> > & bmp_array, vector<e_channel
 	shared_ptr<uint8_t> buffer;
 	uint8_t * p_buffer;
 	shared_ptr<s_ifd_key> key(new s_ifd_key[ifd_key_num]);
+	c_file fl(fname, MODE_WRITE);
 	s_ifd_key * p_key = key.get();
-	shared_ptr<FILE> fl(fopen(fname.c_str(), "w"), fclose); // TODO
-	FILE * p_fl = fl.get();
 	t_channel tch;
 	e_channel_type tch_type;
 	s_header header;
@@ -399,7 +396,7 @@ void algo::save_tiff(vector<shared_ptr<c_bitmap> > & bmp_array, vector<e_channel
 	header.not_used42 = 42;
 	header.first_ifd = sizeof(s_header);
 
-	fwrite(& header, sizeof(header), 1, p_fl);
+	fl.write(& header, sizeof(header));
 
 	p_key[0].tag = IMAGE_WIDTH_TAG;
 	p_key[0].type = LONG;
@@ -471,7 +468,7 @@ void algo::save_tiff(vector<shared_ptr<c_bitmap> > & bmp_array, vector<e_channel
 		tch = ch[u];
 		strip_height = 50;
 		strip_num = height / strip_height;
-		pos = ftell(p_fl) + ifd_size;
+		pos = fl.tell() + ifd_size;
 
 		if(height % strip_height || height < strip_height)
 		{
@@ -591,9 +588,9 @@ void algo::save_tiff(vector<shared_ptr<c_bitmap> > & bmp_array, vector<e_channel
 		buffer.reset(new uint8_t[buf_size]);
 		p_buffer = buffer.get();
 
-		fwrite(& ifd_key_num, sizeof(ifd_key_num), 1, p_fl);
-		fwrite(p_key, sizeof(s_ifd_key), ifd_key_num, p_fl);
-		fwrite(& next_ifd_off, sizeof(next_ifd_off), 1, p_fl);
+		fl.write(& ifd_key_num, sizeof(ifd_key_num));
+		fl.write(p_key, sizeof(s_ifd_key) * ifd_key_num);
+		fl.write(& next_ifd_off, sizeof(next_ifd_off));
 
 		for(v = 0; v < strip_num; v++, pos += strip_size, p_buffer += 4)
 			* ((uint32_t *) p_buffer) = pos;
@@ -647,7 +644,9 @@ case type_id: \
 			PUT_DATA(CHANNEL_TYPE_DOUBLE, double, 8, get_real);
 		}
 
-		fwrite(buffer.get(), buf_size, 1, p_fl);
+		fl.write(buffer.get(), buf_size);
 	}
+
+	fl.mark_as_not_delete_on_close_after_write();
 }
 

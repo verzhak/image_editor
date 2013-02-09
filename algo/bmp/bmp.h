@@ -2,8 +2,6 @@
 #ifndef BMP_H
 #define BMP_H
 
-#include "algo/algo.h"
-
 #define WORD uint16_t
 #define DWORD uint32_t
 
