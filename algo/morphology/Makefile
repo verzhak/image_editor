@@ -8,9 +8,9 @@ INTERFACE_DIR = ../interface/
 COMPILER = ghc
 INTERFACE = ${INTERFACE_DIR}/interface.hs
 SOURCE_FILE_SUFFIX = hs
-FLAGS = --make -dynamic -shared -fPIC -no-hs-main -odir ${MODULE_BUILD_DIR} -hidir ${MODULE_BUILD_DIR} -stubdir ${MODULE_BUILD_DIR}
+FLAGS = --make -dynamic -shared -fPIC -threaded -no-hs-main -odir ${MODULE_BUILD_DIR} -hidir ${MODULE_BUILD_DIR} -stubdir ${MODULE_BUILD_DIR}
 DEBUG_FLAGS =
-RELEASE_FLAGS = # TODO
+RELEASE_FLAGS = -O2
 
 ############################################################################ 
 # Независимые параметры

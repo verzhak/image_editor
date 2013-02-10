@@ -1,5 +1,6 @@
 
 # TODO valgrind
+# TODO haskell
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -7,7 +8,7 @@ find_package(SDL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PC_PCRECPP QUIET libpcrecpp)
 set(haskell_include /usr/lib/ghc-7.6.1/include/)
-set(haskell_library /usr/lib/ghc-7.6.1/base-4.6.0.0/libHSbase-4.6.0.0-ghc7.6.1.so /usr/lib/ghc-7.6.1/integer-gmp-0.5.0.0/libHSinteger-gmp-0.5.0.0-ghc7.6.1.so gmp /usr/lib/ghc-7.6.1/ghc-prim-0.3.0.0/libHSghc-prim-0.3.0.0-ghc7.6.1.so /usr/lib/ghc-7.6.1/libHSrts-ghc7.6.1.so)
+set(haskell_library /usr/lib/ghc-7.6.1/base-4.6.0.0/libHSbase-4.6.0.0-ghc7.6.1.so /usr/lib/ghc-7.6.1/integer-gmp-0.5.0.0/libHSinteger-gmp-0.5.0.0-ghc7.6.1.so gmp /usr/lib/ghc-7.6.1/ghc-prim-0.3.0.0/libHSghc-prim-0.3.0.0-ghc7.6.1.so /usr/lib/ghc-7.6.1/libHSrts_thr-ghc7.6.1.so rt)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
 

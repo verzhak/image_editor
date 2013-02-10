@@ -12,7 +12,9 @@ foreign export ccall morphology :: Bitmap -> Bitmap
 
 morphology :: Bitmap -> Bitmap
 
--- TODO
+-- TODO timer_settime: Invalid argument
+-- TODO алгоритм
+
 morphology src = do
 {
 	create (height src) (width src)
