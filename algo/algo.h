@@ -68,7 +68,10 @@ namespace algo
 
 	shared_ptr<c_bitmap> radiometric_correction(c_bitmap & bmp, unsigned N);
 
-	extern "C" c_bitmap * morphology(c_bitmap * src);
+	extern "C" c_bitmap * dilate(c_bitmap * src, unsigned elem_height, unsigned elem_width);
+	extern "C" c_bitmap * erode(c_bitmap * src, unsigned elem_height, unsigned elem_width);
+	extern "C" c_bitmap * morphology_open(c_bitmap * src, unsigned elem_height, unsigned elem_width);
+	extern "C" c_bitmap * morphology_close(c_bitmap * src, unsigned elem_height, unsigned elem_width);
 };
 
 #endif

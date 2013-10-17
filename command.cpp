@@ -155,11 +155,10 @@ void script_load(queue<string> & command_list, string & fname)
 
 bool do_command(string & command)
 {
-	unsigned v, y, x, height, width, N;
+	unsigned v, y, x, height, width, N, ch;
 	double angle, k;
-	string driver, channel, fname, arg, disp_name, disp_name_2, new_disp_name, data_type, range, angle_unity;
+	string driver, channel, fname, arg, operation, disp_name, disp_name_2, new_disp_name, data_type, range, angle_unity;
 	string disp_name_A, disp_name_Dh, disp_name_Dv, disp_name_Dd, wv_fun, matrix_name;
-	unsigned ch;
 	e_matrix matrix;
 	c_display * p_disp, * p_disp_2;
 	map<string, c_display *>::iterator iter, p_disp_iter;
@@ -655,13 +654,27 @@ bool do_command(string & command)
 			return true;
 		}
 
-		if(regexp[COMMAND_MORPHOLOGY]->FullMatch(command, & disp_name, & new_disp_name))
+		if(regexp[COMMAND_MORPHOLOGY]->FullMatch(command, & operation, & disp_name, & new_disp_name, & height, & width))
  		{
-			// TODO
 			FIND_DISP(disp_name, p_disp);
-			CHECK_INSERT_DISP(morphology(p_disp->bitmap_ptr()));
+
+			if(height == 0 || width == 0)
+				throw string("Некорректный размер структурного элемента для морфологической операции");
+
+#define MORPHOLOGY_OPERATION(oname, op)\
+if(operation == oname)\
+{\
+	CHECK_INSERT_DISP(op(p_disp->bitmap_ptr(), height, width));\
+\
+	return true;\
+}
+
+			MORPHOLOGY_OPERATION("dilate", dilate);
+			MORPHOLOGY_OPERATION("erode", erode);
+			MORPHOLOGY_OPERATION("open", morphology_open);
+			MORPHOLOGY_OPERATION("close", morphology_close);
  
-			return true;
+			throw string("Неизвестная морфологическая операция");
 		}
 	}
 	catch(string & err)
@@ -730,7 +743,7 @@ void main_loop::init()
 				new RE("^[ \\t]*(?:correction radiometric|crad)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]+([\\d]+)[ \\t]*$")));
 
 	regexp.insert(make_pair(COMMAND_MORPHOLOGY,
-				new RE("^[ \\t]*(?:morphology|m)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]*$")));
+				new RE("^[ \\t]*(?:morphology|m)[ \\t]+(\\w+)[ \\t]+([^ \\t]+)[ \\t]+([^ \\t]+)[ \\t]+([\\d]+)[ \\t]+([\\d]+)[ \\t]*$")));
 }
 
 void main_loop::destroy()
