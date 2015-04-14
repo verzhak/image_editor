@@ -669,10 +669,10 @@ if(operation == oname)\
 	return true;\
 }
 
-			MORPHOLOGY_OPERATION("dilate", dilate);
-			MORPHOLOGY_OPERATION("erode", erode);
-			MORPHOLOGY_OPERATION("open", morphology_open);
-			MORPHOLOGY_OPERATION("close", morphology_close);
+//			MORPHOLOGY_OPERATION("dilate", dilate);
+//			MORPHOLOGY_OPERATION("erode", erode);
+//			MORPHOLOGY_OPERATION("open", morphology_open);
+//			MORPHOLOGY_OPERATION("close", morphology_close);
  
 			throw string("Неизвестная морфологическая операция");
 		}

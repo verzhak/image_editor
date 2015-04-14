@@ -7,8 +7,8 @@ cmake_minimum_required(VERSION 2.8)
 find_package(SDL REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(PC_PCRECPP QUIET libpcrecpp)
-set(haskell_include /usr/lib/ghc-7.6.1/include/)
-set(haskell_library /usr/lib/ghc-7.6.1/base-4.6.0.0/libHSbase-4.6.0.0-ghc7.6.1.so /usr/lib/ghc-7.6.1/integer-gmp-0.5.0.0/libHSinteger-gmp-0.5.0.0-ghc7.6.1.so gmp /usr/lib/ghc-7.6.1/ghc-prim-0.3.0.0/libHSghc-prim-0.3.0.0-ghc7.6.1.so /usr/lib/ghc-7.6.1/libHSrts_thr-ghc7.6.1.so rt)
+# set(haskell_include /usr/lib/ghc-7.8.4/include/)
+# set(haskell_library /usr/lib/ghc-7.8.4/base-4.7.0.2/libHSbase-4.7.0.2-ghc7.8.4.so /usr/lib/ghc-7.8.4/integer-gmp-0.5.0.0/libHSinteger-gmp-0.5.0.0-ghc7.8.4.so gmp /usr/lib/ghc-7.8.4/ghc-prim-0.3.0.0/libHSghc-prim-0.3.0.0-ghc7.8.4.so /usr/lib/ghc-7.8.4/libHSrts_thr-ghc7.8.4.so rt)
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "")
 
@@ -22,7 +22,7 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "")
 endif()
 
 set(CMAKE_CXX_FLAGS "-std=c++11")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${haskell_include})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}) # ${haskell_include})
 link_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 ############################################################################ 
@@ -49,7 +49,7 @@ add_library(amv_wavelet SHARED ${amv_wavelet_sources})
 
 set(amv_ip_sources main.cpp command.cpp stub.cpp lib/file.cpp bitmap/color.cpp bitmap/bitmap.cpp bitmap/display.cpp algo/interface/interface.cpp)
 add_executable(amv_ip ${amv_ip_sources})
-target_link_libraries(amv_ip amv_bmp amv_correction amv_filter amv_matrix amv_morphology amv_tiff amv_various amv_wavelet m readline history ${SDL_LIBRARY} ${PC_PCRECPP_LDFLAGS} ${haskell_library})
+target_link_libraries(amv_ip amv_bmp amv_correction amv_filter amv_matrix amv_tiff amv_various amv_wavelet m readline history ${SDL_LIBRARY} ${PC_PCRECPP_LDFLAGS}) # amv_morphology ${haskell_library})
 
 ############################################################################ 
 # Модули на языках, не привязываемых к CMake
@@ -64,7 +64,7 @@ else()
 
 endif()
 
-add_custom_target(amv_morphology)
-add_custom_command(TARGET amv_morphology COMMAND make ARGS -C ${CMAKE_CURRENT_SOURCE_DIR}/algo/morphology ${amv_morphology_target})
-add_dependencies(amv_ip amv_morphology)
+# add_custom_target(amv_morphology)
+# add_custom_command(TARGET amv_morphology COMMAND make ARGS -C ${CMAKE_CURRENT_SOURCE_DIR}/algo/morphology ${amv_morphology_target})
+# add_dependencies(amv_ip amv_morphology)
 
